@@ -97,13 +97,12 @@ const AllButtons = memo(({
 
         //add button to a row
         for(let j = 0; j<rowButtonCount; ++j){
-            // console.log(buttonIndex);
             if (buttonIndex === buttonChosen) chosenButtonFlag = true;
             const localButtonIndex = buttonIndex;
             rowButtons.push(
                 <Button 
                 key={buttonInfo[localButtonIndex].id}
-                className="customButton"
+                className={(localButtonIndex === buttonChosen) ? "cuustomButtonClicked" : "customButton"}
                 onClick={() => setButtonChosen(localButtonIndex)}
                 > 
                     <div >
@@ -116,6 +115,7 @@ const AllButtons = memo(({
                 break;
             };
         }
+
         //Add to the whole thing of buttons.
         //If there is a button chosen, add the description
         allButtons.push(
@@ -148,6 +148,7 @@ const AllButtons = memo(({
     return allButtons;
 });
 
+//Mock data
 const buttonInfo = [...Array(16).keys()]
     .map((i) => {
         return {

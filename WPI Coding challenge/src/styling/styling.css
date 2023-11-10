@@ -4,6 +4,16 @@
     margin: 10px;
 }
 
+.cuustomButtonClicked {
+    width: 300px;
+    height: 100px;
+    margin: 10px;
+    background-color: rgb(156, 45, 4);
+    color: rgb(255, 255, 255);
+}
+
+
+
 .buttonDrawer {
     max-width: 1600px;
 }
