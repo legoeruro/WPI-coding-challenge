@@ -1,3 +1,11 @@
+# How to run this:
+Make sure you have npm installed. After cloning the project, change directory into the 'WPI Coding challenge'.
+install all dependencies using the command:
+`npm install`
+
+To run locally, use:
+`npm run dev`
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
