@@ -3,57 +3,143 @@ import {
 } from 'react-bootstrap';
 
 import "../styling/styling.css"
+import React, { useEffect } from 'react';
 
-const ButtonCount = 16;
+import { useState, memo } from 'react';
 
-//Look for a way to 
+//import useMeasure from "react-use-measure";
+
+import useWindowDimensions from '../hooks/useWindowDimesions';
+
+const BUTTONCOUNT = 16;
+
+//Look for a way to get this instead of specifying here
+//from styling.css
+const BUTTONWIDTH = 300;
+const BUTTONMARGIN = 10;
+const DIVWIDTH = 1600;
 
 const ButtonDrawer = () => {
-    console.log("haii");
-    const nRowButtons = numOfButtonInRow(1000, 100, 10);
+    // For some reason useMeasure console logging works normally,
+    // but using the result from useMeasure cause memory to skyrocket. (took me 2 hours to stop using this :( )
+    // that's why i have to use the window width instead of the div width
+    // const [ref, rect] = useMeasure();
+    // useEffect(() => {
+    //     setRowButtonCount(numOfButtonInRow(rect.width, buttonWidth, buttonMargin));
+    // }, [rect.width])
+
+    const [buttonChosen, setButtonChosen] = useState(-1);
+
+    const changeStateButtonChose = (buttonIndex: number) => {
+        console.log( "buttonIndex: " + buttonIndex + " buttonChosen: " + buttonChosen)
+        if (buttonIndex === buttonChosen) setButtonChosen(-1);
+        else setButtonChosen(buttonIndex);
+    }
+
+    const { width: windowWidth } = useWindowDimensions();
+
+    const width = (windowWidth < DIVWIDTH) ? windowWidth : DIVWIDTH;
+
+    const rowButtonCount = numOfButtonInRow(width, BUTTONWIDTH, BUTTONMARGIN);
+
     return (
-    <div
-        className="buttonDrawer"
-    >
-        {
-            [...Array().keys()]
-        }
-        {
-            buttonInfo.map(
-                (info) => {
-                 return (
-                 <Button 
-                    key={info.id}
-                    className="customButton"
-                > 
-                        <div >
-                            {info.title}
-                        </div>
-                 </Button>
-                 );
-            })
-        }
-    </div>
+        <>
+            <div
+                className="buttonDrawer"
+            >
+                <AllButtons
+                    rowButtonCount={rowButtonCount}
+                    setButtonChosen={changeStateButtonChose}
+                    buttonChosen={buttonChosen}
+                />
+            </div>
+        </>
     );
-}
-
-const buttonRow = () => {
-
 }
 
 const numOfButtonInRow = (
     divWidth: number, buttonWidth: number, 
     margin: number) =>
 {
-    const buttonTotalWidth = buttonWidth + 2*margin;
-    return Math.floor(divWidth / buttonTotalWidth);
+    const buttonTotalWidth = buttonWidth + margin;
+    //BUTTONWIDTH/2 is a magic number, which stops the buttons from prematurely stacking on top of each other.
+    //there could possibly be a better option.
+    const numbutton = Math.floor((divWidth - BUTTONWIDTH/2) / buttonTotalWidth) || 1
+    return numbutton < 5 ? numbutton : 4;
 }
 
-const RowButtons = () => {
-    const rows = [];
-    const numRows = ButtonCount/numOfButtonInRow();
-    for (let i = 0; i<)
+interface AllButtonsProps {
+    rowButtonCount: number,
+    setButtonChosen: (buttonIndex: number) => void,
+    buttonChosen: number,
 }
+
+//Revision if possible
+const AllButtons = memo(({
+    rowButtonCount,
+    setButtonChosen,
+    buttonChosen,
+}: AllButtonsProps) => {
+    const allButtons: React.JSX.Element[] = [];
+    const numRows = BUTTONCOUNT/rowButtonCount;
+    
+    let buttonIndex = 0;
+    for (let i = 0; i<numRows; ++i){
+        const rowButtons: React.JSX.Element[] = [];
+        
+        let chosenButtonFlag = false;
+
+        //add button to a row
+        for(let j = 0; j<rowButtonCount; ++j){
+            if (buttonIndex === buttonChosen) chosenButtonFlag = true;
+            rowButtons.push(
+                <Button 
+                key={buttonInfo[buttonIndex].id}
+                className="customButton"
+                onClick={() => setButtonChosen(buttonIndex)}
+                > 
+                    <div >
+                        {buttonInfo[buttonIndex].title}
+                    </div>
+                </Button>
+            );
+            ++buttonIndex;
+            if (buttonIndex >= 16) {
+                break;
+            };
+        }
+        //Add to the whole thing of buttons.
+        //If there is a button chosen, add the description
+        allButtons.push(
+            <>
+                {rowButtons}
+                <br/>
+                {chosenButtonFlag && 
+                <>
+                    <h4
+                    style={{
+                        color: "red",
+                        textAlign: "left",
+                    }}>
+                        {buttonInfo[buttonChosen].title}
+                    </h4>
+                    <p
+                        style={{
+                            textAlign: "left",
+                        }}
+                    >
+                        {buttonInfo[buttonChosen].desc}
+                    </p>
+                </>
+                }
+                <br/>
+
+            </>
+        );
+    }
+    console.log(allButtons)
+    return allButtons;
+});
 
 const buttonInfo = [...Array(16).keys()]
     .map((i) => {
